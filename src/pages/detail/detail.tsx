@@ -4,6 +4,7 @@ import { View, Button } from '@tarojs/components'
 import { AtList, AtListItem, AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction, AtInputNumber } from "taro-ui"
 import {aType, aPlatform} from '../../util/const'
 import {chapterData} from '../../types/common'
+import {getStorage, setStorage} from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/modal.scss"
@@ -58,34 +59,24 @@ export default class Detail extends Component<{}, DetailState> {
 
     this.index = +this.$instance.router.params.index || 0
     let chapter: chapterData
+    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
 
-    if (this.index) {
-      const {keys} = Taro.getStorageInfoSync()
-      if (keys.length > 0) {
-        const data = Taro.getStorageSync('chapter')
-        if (data) {
-          const aChapterData: chapterData[] = JSON.parse(data)
-          let item: chapterData
-          for (item of aChapterData) {
-            if (item.index === self.index) {
-              chapter = item
-            }
-          }
-          if (!chapter) {
-            Taro.navigateBack()
-          } else {
-            const curChapterNum = this.fCurChapterNum(chapter)
-            const leftChaper = this.fLeftChapterNum(chapter, curChapterNum)
-            this.setState({
-              chapter,
-              curChapterNum,
-              leftChaper
-            })
-          }
-        }
+    let item: chapterData
+    for (item of aChapterData) {
+      if (item.index === self.index) {
+        chapter = item
       }
-    } else {
+    }
+    if (!chapter) {
       Taro.navigateBack()
+    } else {
+      const curChapterNum = this.fCurChapterNum(chapter)
+      const leftChaper = this.fLeftChapterNum(chapter, curChapterNum)
+      this.setState({
+        chapter,
+        curChapterNum,
+        leftChaper
+      })
     }
   }
 
@@ -241,38 +232,21 @@ export default class Detail extends Component<{}, DetailState> {
       chapter
     })
 
-    Taro.getStorage({
-      key: 'chapter',
-      success (res) {
-        const aChapterData: chapterData[] = JSON.parse(res.data)
-        let includeIndex: number = -1
-        aChapterData.forEach((item: chapterData, index: number) => {
-          if (item.index === chapter.index) {
-            includeIndex = index
-          }
-        })
-
-        if (includeIndex > -1) {
-          aChapterData[includeIndex] = chapter
-          Taro.setStorage({
-            key: 'chapter',
-            data: JSON.stringify(aChapterData),
-            success () {
-              Taro.showToast({
-                title: '保存成功',
-                icon: 'none'
-              })
-            },
-            fail () {
-              Taro.showToast({
-                title: '保存失败',
-                icon: 'none'
-              })
-            }
-          })
-        }
+    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
+    let includeIndex: number = -1
+    aChapterData.forEach((item: chapterData, index: number) => {
+      if (item.index === chapter.index) {
+        includeIndex = index
       }
     })
+    if (includeIndex > -1) {
+      aChapterData[includeIndex] = chapter
+      setStorage<chapterData>('chapter', aChapterData)
+      Taro.showToast({
+        title: '保存成功',
+        icon: 'none'
+      })
+    }
   }
 
   handleDelClick () {
@@ -288,33 +262,19 @@ export default class Detail extends Component<{}, DetailState> {
   }
 
   handleComfrimDel () {
-    const {keys} = Taro.getStorageInfoSync()
-    if (keys.length > 0) {
-      const data = Taro.getStorageSync('chapter')
-      if (data) {
-        let aChapterData: chapterData[] = JSON.parse(data)
-        let chapterIndex: number = -1
-        let len: number = aChapterData.length
-        for (let i = 0; i < len; i++) {
-          if (aChapterData[i].index === this.index) {
-            chapterIndex = i
-            break
-          }
-        }
-        if (chapterIndex > -1) {
-          aChapterData.splice(chapterIndex, 1)
-          try {
-            Taro.setStorageSync('chapter', JSON.stringify(aChapterData))
-            Taro.switchTab({
-              url: '/pages/index/index'
-            })
-          } catch (e) {
-            Taro.showToast({
-              title: '删除失败'
-            })
-          }
-        }
+    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
+    let includeIndex: number = -1
+    aChapterData.forEach((item: chapterData, index: number) => {
+      if (item.index === this.index) {
+        includeIndex = index
       }
+    })
+    if (includeIndex > -1) {
+      aChapterData.splice(includeIndex, 1)
+      setStorage<chapterData>('chapter', JSON.stringify(aChapterData))
+      Taro.switchTab({
+        url: '/pages/index/index'
+      })
     }
   }
 

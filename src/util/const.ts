@@ -1,4 +1,5 @@
-import Taro from '@tarojs/taro'
+import {getStorage} from './common'
+import {PlatformItem} from '../types/common'
 
 export const aType = [
   { label: '电视剧', value: 'tvplay' },
@@ -6,14 +7,7 @@ export const aType = [
   { label: '动漫', value: 'cartoon' }
 ]
 
-let platformStorage = []
-const {keys} = Taro.getStorageInfoSync()
-if (keys.length > 0) {
-  const data = Taro.getStorageSync('platform')
-  if (data) {
-    platformStorage = JSON.parse(data)
-  }
-}
+const platformStorage = getStorage<PlatformItem>('platform')
 
 export const aPlatform = platformStorage.length ? platformStorage : [
   { label: '爱奇艺', value: 'iqiyi' },

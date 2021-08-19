@@ -2,6 +2,8 @@ import { Component } from 'react'
 import Taro from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import { AtButton } from 'taro-ui'
+import {chapterData} from '../../types/common'
+import {getStorage} from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/button.scss" // 按需引入
@@ -23,11 +25,10 @@ export default class Export extends Component<{}, ExportState> {
   componentWillMount () { }
 
   componentDidMount () {
-    const {keys} = Taro.getStorageInfoSync()
-    if (keys.length > 0) {
-      const aChapterData = Taro.getStorageSync('chapter')
+    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
+    if (aChapterData.length) {
       this.setState({
-        chapterJSON: aChapterData
+        chapterJSON: JSON.stringify(aChapterData)
       })
     }
   }

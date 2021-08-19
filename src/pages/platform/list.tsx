@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro'
 import { AtList, AtListItem, AtButton, AtInput, AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
 import {PlatformItem} from '../../types/common'
 import {aPlatform} from '../../util/const'
+import { setStorage } from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -46,23 +47,10 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
 
   initPlatformData () {
     this.aPlatform = aPlatform
-    const {keys} = Taro.getStorageInfoSync()
-    if (keys.length > 0) {
-      const data: string = Taro.getStorageSync('platform')
-      if (!data) {
-        this.storePlatformStorage(aPlatform)
-      } else {
-        this.aPlatform = JSON.parse(data)
-      }
-    } else {
-      this.storePlatformStorage(aPlatform)
-    }
   }
 
   storePlatformStorage (aPlatform: PlatformItem[]) {
-    try {
-      Taro.setStorageSync('platform', JSON.stringify(aPlatform))
-    } catch (e) {}
+    setStorage<PlatformItem>('platform', aPlatform)
   }
 
   componentDidShow () {

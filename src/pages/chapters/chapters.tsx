@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro'
 import ChapterList from '../index/chapterList'
 import {chapterData, ChapterListItemProp} from '../../types/common'
 import {aPlatform} from '../../util/const'
+import {getStorage} from '../../util/common'
 
 import './chapters.scss'
 
@@ -28,24 +29,20 @@ export default class Chapters extends Component {
   componentWillUnmount () { }
 
   componentDidShow () {
-    const {keys} = Taro.getStorageInfoSync()
-    if (keys.length > 0) {
-      const data = Taro.getStorageSync('chapter')
-      if (data) {
-        const aChapterData: chapterData[] = JSON.parse(data)
-        let item: chapterData
-        let aList: ChapterListItemProp[] = []
-        for (item of aChapterData) {
-          aList.push({
-            index: item.index,
-            title: item.title,
-            chapterNum: item.isEnd ? '已完结' : '',
-            platform: oPlatform[item.platform]
-          })
-        }
-
-        this.chapterListRef.current && this.chapterListRef.current.fSetList(aList)
+    const aChapterData = getStorage<chapterData>('chapter')
+    if (aChapterData.length) {
+      let item: chapterData
+      let aList: ChapterListItemProp[] = []
+      for (item of aChapterData) {
+        aList.push({
+          index: item.index,
+          title: item.title,
+          chapterNum: item.isEnd ? '已完结' : '',
+          platform: oPlatform[item.platform]
+        })
       }
+
+      this.chapterListRef.current && this.chapterListRef.current.fSetList(aList)
     }
   }
 

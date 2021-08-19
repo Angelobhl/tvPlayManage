@@ -1,5 +1,5 @@
 import { Component, createRef } from 'react'
-import { View, Text } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AtButton } from 'taro-ui'
 import Calendar from '../../components/calendar'
@@ -7,6 +7,7 @@ import ChapterList from './chapterList'
 import {CalendarDay} from '../../types/calendar'
 import {chapterData, chapterCalendarItemData, chapterCalendarData, ChapterListItemProp} from '../../types/common'
 import {aPlatform} from '../../util/const'
+import { getStorage } from '../../util/common'
 
 let oPlatform = {}
 aPlatform.forEach(item => {
@@ -59,18 +60,14 @@ export default class Index extends Component<{}> {
   componentWillUnmount () { }
 
   componentDidShow () {
-    const {keys} = Taro.getStorageInfoSync()
-    if (keys.length > 0) {
-      const data = Taro.getStorageSync('chapter')
-      if (data) {
-        const aChapterData: chapterData[] = JSON.parse(data)
-        this.aChapterData = aChapterData
-        let item: chapterData
-        for (item of this.aChapterData) {
-          this.oChapterData['index_' + item.index] = item
-        }
-        this.fInitChapterData()
+    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
+    if (aChapterData.length) {
+      this.aChapterData = aChapterData
+      let item: chapterData
+      for (item of this.aChapterData) {
+        this.oChapterData['index_' + item.index] = item
       }
+      this.fInitChapterData()
     }
   }
 
@@ -214,9 +211,6 @@ export default class Index extends Component<{}> {
   }
 
   render () {
-    // const markDate = [{
-    //   value: new Date(2021, 5, 11, 0, 0, 0)
-    // }]
     return (
       <View className='index'>
         <Calendar source="index" afterRender={this.handleCalendarRender.bind(this)} handleDayClick={this.handleCalendarDayClick.bind(this)} ref={this.calendarRef} />

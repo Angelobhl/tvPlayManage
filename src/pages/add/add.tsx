@@ -5,6 +5,7 @@ import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtRadio, AtCheckbox, AtList, AtListItem, AtInputNumber } from 'taro-ui'
 import {aType, aPlatform} from '../../util/const'
 import {addState, chapterData} from '../../types/common'
+import {getStorage, setStorage} from '../../util/common'
 
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -164,32 +165,18 @@ export default class Add extends Component<{}, addState> {
       oData.endDate = endDate
     }
 
-    const {keys} = Taro.getStorageInfoSync()
-    let aData: chapterData[]
-    if (keys.length > 0) {
-      const data = Taro.getStorageSync('chapter')
-      aData = data ? JSON.parse(data) : []
-      fSaveData(aData, oData)
-    } else {
-      aData = []
-      fSaveData(aData, oData)
-    }
+    const aData: chapterData[] = getStorage<chapterData>('chapter')
+    fSaveData(aData, oData)
   }
 
   fSaveData (aData: chapterData[], oData: chapterData) {
     oData.index = aData.length ? aData[aData.length - 1].index + 1 : 1
     aData.push(oData)
 
-    try {
-      Taro.setStorageSync('chapter', JSON.stringify(aData))
-      Taro.switchTab({
-        url: '/pages/index/index'
-      })
-    } catch (e) {
-      Taro.showToast({
-        title: '添加失败'
-      })
-    }
+    setStorage<chapterData>('chapter', aData)
+    Taro.switchTab({
+      url: '/pages/index/index'
+    })
   }
 
   render () {

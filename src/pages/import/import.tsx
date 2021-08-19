@@ -2,6 +2,7 @@ import { Component } from 'react'
 import Taro from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtButton, AtTextarea } from 'taro-ui'
+import {setStorage} from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/button.scss" // 按需引入
@@ -43,7 +44,7 @@ export default class Import extends Component<{}, ImportState> {
   handleSave () {
     try {
       if (this.state.chapterJSON) {
-        Taro.setStorageSync('chapter', this.state.chapterJSON)
+        setStorage('chapter', this.state.chapterJSON)
         Taro.showToast({
           title: '保存成功'
         })
