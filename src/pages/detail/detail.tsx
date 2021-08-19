@@ -3,7 +3,7 @@ import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { View, Button } from '@tarojs/components'
 import { AtList, AtListItem, AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction, AtInputNumber } from "taro-ui"
 import {aType, aPlatform} from '../../util/const'
-import {chapterData} from '../../types/common'
+import {chapterData, WaitingItem} from '../../types/common'
 import {getStorage, setStorage} from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
@@ -24,6 +24,7 @@ function FormField (props: {label: string, children: React.ReactNode}) {
 }
 
 interface LeftChaper {
+  fullDate: string,
   chapter: string,
   date: string
 }
@@ -175,6 +176,7 @@ export default class Detail extends Component<{}, DetailState> {
           if (leftChaperNum > 0) {
             curChapterNum++
             leftChaper.push({
+              fullDate: [loopDate.getFullYear(), loopDate.getMonth() + 1, loopDate.getDate()].join('-'),
               chapter: curChapterNum + '集',
               date: [loopDate.getMonth() + 1, loopDate.getDate()].join('-')
             })
@@ -278,6 +280,33 @@ export default class Detail extends Component<{}, DetailState> {
     }
   }
 
+  handleLeftChapterClick (leftChaper: LeftChaper) {
+    Taro.showModal({
+      title: '想看',
+      content: '添加到想到？',
+      success (res) {
+        if (res.confirm) {
+          console.log('用户点击确定')
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    }).then(res => {
+      if (res.confirm) {
+        let waitingList: WaitingItem[] = getStorage<WaitingItem>('waiting')
+        let item: WaitingItem = {
+          index: waitingList.length ? waitingList[waitingList.length - 1].index + 1 : 1,
+          title: `${this.state.chapter.title}[${leftChaper.chapter}]`,
+          type: this.state.chapter.type,
+          platform: this.state.chapter.platform,
+          date: leftChaper.fullDate
+        }
+        waitingList.push(item)
+        setStorage<WaitingItem>('waiting', waitingList)
+      }
+    })
+  }
+
   render () {
     return (
       <View className="detail-page">
@@ -327,7 +356,7 @@ export default class Detail extends Component<{}, DetailState> {
               {
                 this.state.leftChaper.map((item: LeftChaper) => {
                   return (
-                    <View className="left-chapter-grid-item">
+                    <View className="left-chapter-grid-item" onClick={this.handleLeftChapterClick.bind(this)}>
                       <View>{item.chapter}</View>
                       <View>{item.date}</View>
                     </View>
