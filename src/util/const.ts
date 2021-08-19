@@ -4,7 +4,8 @@ import {PlatformItem} from '../types/common'
 export const aType = [
   { label: '电视剧', value: 'tvplay' },
   { label: '综艺', value: 'varietyshow' },
-  { label: '动漫', value: 'cartoon' }
+  { label: '动漫', value: 'cartoon' },
+  { label: '电影', value: 'film' }
 ]
 
 const platformStorage = getStorage<PlatformItem>('platform')

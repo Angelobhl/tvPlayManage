@@ -40,3 +40,14 @@ export interface PlatformItem {
   label: string,
   value: string
 }
+
+export interface WaitingItemAdd {
+  title: string,
+  date: string,
+  type: string,
+  platform: string
+}
+
+export interface WaitingItem extends WaitingItemAdd {
+  index: number
+}

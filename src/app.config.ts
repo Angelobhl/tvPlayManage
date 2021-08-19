@@ -11,12 +11,15 @@ export default {
     'pages/accounts/edit',
     'pages/accounts/export',
     'pages/accounts/import',
-    'pages/platform/list'
+    'pages/platform/list',
+    'pages/waiting/list',
+    'pages/waiting/form'
   ],
   tabBar: {
     position: 'top',
     list: [
       {pagePath: 'pages/index/index', text: '剧集'},
+      {pagePath: 'pages/waiting/list', text: '想看'},
       {pagePath: 'pages/accounts/list', text: '会员'}
     ]
   },
