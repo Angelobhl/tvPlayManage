@@ -7,6 +7,7 @@ import {WaitingItem} from '../../types/common'
 import {aPlatform, aType} from '../../util/const'
 import { getStorage, setStorage } from '../../util/common'
 
+import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
 import 'taro-ui/dist/style/components/button.scss' // 按需引入
@@ -31,13 +32,13 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
   constructor (prop: {}) {
     super(prop)
 
-    this.setState({
+    this.state = {
       index: 0,
       title: '',
       date: '',
       type: '',
       platform: ''
-    })
+    }
   }
 
   componentDidShow () {
@@ -110,10 +111,36 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
       this.aList.push(item)
     }
 
-    setStorage('waiting', this.aList)
+    setStorage<WaitingItem>('waiting', this.aList)
     Taro.switchTab({
       url: '/pages/waiting/list'
     })
+  }
+
+  handleBeWatching () {
+    Taro.redirectTo({
+      url: `/pages/add/add?waiting=${this.state.index}`
+    })
+  }
+
+  handleDel () {
+    if (this.state.index > 0) {
+      let index: number = -1
+      let len: number = this.aList.length
+      for (let i = 0; i < len; i++) {
+        if (this.aList[i].index === this.state.index) {
+          index = i
+        }
+      }
+
+      if (index > -1) {
+        this.aList.splice(index, 1)
+        setStorage<WaitingItem>('waiting', this.aList)
+        Taro.switchTab({
+          url: '/pages/waiting/list'
+        })
+      }
+    }
   }
 
   render () {
@@ -151,6 +178,18 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
             </Picker>
           </FormField>
           <AtButton type="primary" size="small" circle={true} onClick={this.handleSave.bind(this)}>保存</AtButton>
+          {
+            this.state.index > 0 ? (
+          <View className="at-row at-row__justify--around" style="margin-top: 10px;">
+            <View className="at-col at-col-5">
+              <AtButton type="primary" size="small" circle={true} onClick={this.handleBeWatching.bind(this)}>开始追</AtButton>
+            </View>
+            <View className="at-col at-col-5">
+              <AtButton type="primary" size="small" circle={true} onClick={this.handleDel.bind(this)}>删除</AtButton>
+            </View>
+          </View>
+            ) : <View></View>
+          }
         </AtForm>
       </View>
     )

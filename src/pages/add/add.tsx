@@ -1,10 +1,10 @@
 import { Component } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { getCurrentInstance } from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtRadio, AtCheckbox, AtList, AtListItem, AtInputNumber } from 'taro-ui'
 import {aType, aPlatform} from '../../util/const'
-import {addState, chapterData} from '../../types/common'
+import {addState, chapterData, WaitingItem} from '../../types/common'
 import {getStorage, setStorage} from '../../util/common'
 
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
@@ -37,6 +37,10 @@ function FormField (props: {label: string, children: React.ReactNode}) {
 }
 
 export default class Add extends Component<{}, addState> {
+  $instance: Taro.Current = getCurrentInstance()
+  waiting: number = -1
+  aWaitingList: WaitingItem[] = []
+
   constructor (props: {}) {
     super(props)
 
@@ -68,7 +72,29 @@ export default class Add extends Component<{}, addState> {
 
   componentWillUnmount () { }
 
-  componentDidShow () { }
+  componentDidShow () {
+    this.waiting = this.$instance.router.params.waiting ? +this.$instance.router.params.waiting : -1
+    console.log(this.waiting)
+
+    if (this.waiting > 0) {
+      this.aWaitingList = getStorage<WaitingItem>('waiting')
+      let item: WaitingItem
+      let len: number = this.aWaitingList.length
+      for (let i = 0; i < len; i++) {
+        if (this.aWaitingList[i].index === this.waiting) {
+          item = this.aWaitingList[i]
+          break
+        }
+      }
+      if (item) {
+        this.setState({
+          title: item.title,
+          type: item.type,
+          platform: item.platform
+        })
+      }
+    }
+  }
 
   componentDidHide () { }
 
@@ -122,7 +148,7 @@ export default class Add extends Component<{}, addState> {
 
   handleSubmit (event) {
     const curDate = new Date()
-    let fSaveData = this.fSaveData
+    // let fSaveData = this.fSaveData
     let oData: chapterData = {
       index: 0,
       title: this.state.title,
@@ -166,7 +192,7 @@ export default class Add extends Component<{}, addState> {
     }
 
     const aData: chapterData[] = getStorage<chapterData>('chapter')
-    fSaveData(aData, oData)
+    this.fSaveData(aData, oData)
   }
 
   fSaveData (aData: chapterData[], oData: chapterData) {
@@ -174,6 +200,22 @@ export default class Add extends Component<{}, addState> {
     aData.push(oData)
 
     setStorage<chapterData>('chapter', aData)
+
+    if (this.waiting && this.aWaitingList.length) {
+      let index = -1
+      let len: number = this.aWaitingList.length
+      for (let i = 0; i < len; i++) {
+        if (this.aWaitingList[i].index === this.waiting) {
+          index = i
+          break
+        }
+      }
+      if (index > -1) {
+        this.aWaitingList.splice(index, 1)
+        setStorage<WaitingItem>('waiting', this.aWaitingList)
+      }
+    }
+
     Taro.switchTab({
       url: '/pages/index/index'
     })

@@ -3,7 +3,13 @@ import { View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AtList, AtListItem, AtButton } from "taro-ui"
 import {WaitingItem} from '../../types/common'
+import {aPlatform} from '../../util/const'
 import { getStorage } from '../../util/common'
+
+let oPlatform = {}
+aPlatform.forEach(item => {
+  oPlatform[item.value] = item.label
+})
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/button.scss'
@@ -16,8 +22,14 @@ interface WaitingListState {
 }
 
 function WaitingListItem (props: WaitingItem) {
+  function handleClick (index: number) {
+    Taro.navigateTo({
+      url: `/pages/waiting/form?index=${index}`
+    })
+  }
+
   return (
-    <AtListItem></AtListItem>
+    <AtListItem title={props.title} note={oPlatform[props.platform]} arrow="right" onClick={() => {handleClick(props.index)}} />
   )
 }
 
@@ -33,11 +45,9 @@ export default class WaitingList extends React.Component<{}, WaitingListState> {
   componentDidShow () {
     const aList: WaitingItem[] = getStorage<WaitingItem>('waiting')
 
-    if (aList.length) {
-      this.setState({
-        aList
-      })
-    }
+    this.setState({
+      aList
+    })
   }
 
   handleAddClick () {
