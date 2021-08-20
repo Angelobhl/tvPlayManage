@@ -134,10 +134,17 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
       }
 
       if (index > -1) {
-        this.aList.splice(index, 1)
-        setStorage<WaitingItem>('waiting', this.aList)
-        Taro.switchTab({
-          url: '/pages/waiting/list'
+        Taro.showModal({
+          title: '提示',
+          content: '确认删除？'
+        }).then(res => {
+          if (res.confirm) {
+            this.aList.splice(index, 1)
+            setStorage<WaitingItem>('waiting', this.aList)
+            Taro.switchTab({
+              url: '/pages/waiting/list'
+            })
+          }
         })
       }
     }

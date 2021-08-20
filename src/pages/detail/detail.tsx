@@ -283,15 +283,9 @@ export default class Detail extends Component<{}, DetailState> {
   handleLeftChapterClick (leftChaper: LeftChaper) {
     Taro.showModal({
       title: '想看',
-      content: '添加到想到？',
-      success (res) {
-        if (res.confirm) {
-          console.log('用户点击确定')
-        } else if (res.cancel) {
-          console.log('用户点击取消')
-        }
-      }
+      content: '添加到想到？'
     }).then(res => {
+      console.log(res)
       if (res.confirm) {
         let waitingList: WaitingItem[] = getStorage<WaitingItem>('waiting')
         let item: WaitingItem = {
@@ -356,7 +350,7 @@ export default class Detail extends Component<{}, DetailState> {
               {
                 this.state.leftChaper.map((item: LeftChaper) => {
                   return (
-                    <View className="left-chapter-grid-item" onClick={this.handleLeftChapterClick.bind(this)}>
+                    <View className="left-chapter-grid-item" onClick={() => { this.handleLeftChapterClick(item) }}>
                       <View>{item.chapter}</View>
                       <View>{item.date}</View>
                     </View>
