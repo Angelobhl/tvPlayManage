@@ -49,12 +49,15 @@
       color: #999999; }
     .calendar-layer .calendar-days .calendar-day.beToday,
     .calendar-layer .calendar-days .calendar-day.picked,
+    .calendar-layer .calendar-days .calendar-day.overdued,
     .calendar-layer .calendar-days .calendar-day.selected {
       color: #fff; }
     .calendar-layer .calendar-days .calendar-day.picked:before,
     .calendar-layer .calendar-days .calendar-day.beToday:before,
     .calendar-layer .calendar-days .calendar-day.selected:before,
+    .calendar-layer .calendar-days .calendar-day.overdued:before,
     .calendar-layer .calendar-days .calendar-day.picked.selected:before,
+    .calendar-layer .calendar-days .calendar-day.picked.overdued.selected:before,
     .calendar-layer .calendar-days .calendar-day.beToday.selected:before,
     .calendar-layer .calendar-days .calendar-day.beToday.picked.selected:before {
       content: '';
@@ -71,3 +74,5 @@
     .calendar-layer .calendar-days .calendar-day.picked:before,
     .calendar-layer .calendar-days .calendar-day.beToday.picked:before {
       background: #af0f0f; }
+    .calendar-layer .calendar-days .calendar-day.overdued:before {
+      background: #999; }

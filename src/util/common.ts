@@ -19,3 +19,13 @@ export const setStorage = function<T>(key: string, data: T[] | string): void {
     Taro.setStorageSync(key, typeof data === 'string' ? data : JSON.stringify(data))
   } catch (e) {}
 }
+
+export const dayArrJoin = function (dayArr: number[] | string[], joinStr: string = '-'): string {
+  if (+dayArr[1] < 10) {
+    dayArr[1] = '0' + dayArr[1]
+  }
+  if (+dayArr[2] < 10) {
+    dayArr[2] = '0' + dayArr[2]
+  }
+  return dayArr.join(joinStr)
+}

@@ -66,6 +66,7 @@
     }
     .calendar-day.beToday,
     .calendar-day.picked,
+    .calendar-day.overdued,
     .calendar-day.selected{
       color: #fff;
     }
@@ -73,7 +74,9 @@
     .calendar-day.picked:before,
     .calendar-day.beToday:before,
     .calendar-day.selected:before,
+    .calendar-day.overdued:before,
     .calendar-day.picked.selected:before,
+    .calendar-day.picked.overdued.selected:before,
     .calendar-day.beToday.selected:before,
     .calendar-day.beToday.picked.selected:before{
       content: '';
@@ -92,6 +95,9 @@
     .calendar-day.picked:before,
     .calendar-day.beToday.picked:before{
       background: #af0f0f;
+    }
+    .calendar-day.overdued:before{
+      background: #999;
     }
   }
 }

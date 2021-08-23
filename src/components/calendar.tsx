@@ -4,6 +4,7 @@ import { AtBadge } from 'taro-ui'
 import {CalendarDay, CalendarProps, CalendarWeek, CalendarState, DayItemProps} from '../types/calendar'
 import '../static/css/calendar.scss'
 import {chapterCalendarData} from '../types/common'
+import {dayArrJoin} from '../util/common'
 
 import 'taro-ui/dist/style/components/badge.scss'
 
@@ -19,6 +20,9 @@ function DayItem (props: DayItemProps) {
   }
   if (day.picked) {
     aClass.push('picked')
+    if (day.beOverdue) {
+      aClass.push('overdued')
+    }
   }
   if (!day.curMonth) {
     aClass.push('disabled')
@@ -67,7 +71,7 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
       month: this.todayMonth
     }
 
-    this.todayDateStr = [this.todayYear, this.todayMonth, this.todayDate].join('-')
+    this.todayDateStr = dayArrJoin([this.todayYear, this.todayMonth, this.todayDate])
 
     this.handleDayClick = this.handleDayClick.bind(this)
   }
@@ -109,7 +113,7 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
     const aDays: CalendarDay[] = []
     let selectDay: CalendarDay
     for (; i <= theLastDate; i++) {
-      const day = [year, month, i].join('-')
+      const day = dayArrJoin([year, month, i])
       const selected: boolean = daySelect ? daySelect === day : day === this.todayDateStr
       aDays.push({
         index: day,
@@ -117,7 +121,8 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
         selected: selected,
         picked: false,
         beToday: day === this.todayDateStr,
-        curMonth: true
+        curMonth: true,
+        beOverdue: false
       })
 
       if (selected) {
@@ -140,7 +145,7 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
       const blankMonth = blankDate.getMonth() + 1
       const blankDay = blankDate.getDate()
 
-      const day = [blankYear, blankMonth, blankDay].join('-')
+      const day = dayArrJoin([blankYear, blankMonth, blankDay])
       aDays.unshift({
         index: day,
         day: blankDay,
@@ -148,7 +153,8 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
         picked: false,
         beToday: day === this.todayDateStr,
         curMonth: false,
-        lastMonth: true
+        lastMonth: true,
+        beOverdue: false
       })
     }
 
@@ -167,7 +173,7 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
       const blankMonth = blankDate.getMonth() + 1
       const blankDay = blankDate.getDate()
 
-      const day = [blankYear, blankMonth, blankDay].join('-')
+      const day = dayArrJoin([blankYear, blankMonth, blankDay])
       aDays.push({
         index: day,
         day: blankDay,
@@ -175,7 +181,8 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
         picked: false,
         beToday: day === this.todayDateStr,
         curMonth: false,
-        lastMonth: false
+        lastMonth: false,
+        beOverdue: false
       })
     }
 
@@ -229,6 +236,7 @@ class Calendar extends React.Component<CalendarProps, CalendarState> {
     for (item of curDays) {
       item.picked = !!calendarData[item.index]
       item.pickNum = item.picked ? calendarData[item.index].length : 0
+      item.beOverdue = item.picked ? item.index < this.todayDateStr : false
     }
     this.setState({
       aDays: curDays

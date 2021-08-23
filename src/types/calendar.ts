@@ -6,7 +6,8 @@ export interface CalendarDay {
   beToday: boolean,
   curMonth: boolean,
   lastMonth?: boolean,
-  pickNum?: number
+  pickNum?: number,
+  beOverdue?: boolean
 }
 
 export interface CalendarProps {

@@ -266,6 +266,7 @@ export default class Add extends Component<{}, addState> {
             <AtInputNumber
               type="digit"
               min={0}
+              max={999}
               step={1}
               value={this.state.updateNum}
               onChange={this.handleUpdateNumChange}
@@ -275,6 +276,7 @@ export default class Add extends Component<{}, addState> {
             <AtInputNumber
               type="digit"
               min={0}
+              max={999}
               step={1}
               value={this.state.curChapterNum}
               onChange={this.handleCurChapterNumChange}
@@ -285,6 +287,7 @@ export default class Add extends Component<{}, addState> {
             <AtInputNumber
               type="digit"
               min={0}
+              max={999}
               step={1}
               value={this.state.totalChapterNum}
               onChange={this.handleTotalChapterNumChange}

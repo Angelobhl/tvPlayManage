@@ -4,7 +4,7 @@ import { View, Button } from '@tarojs/components'
 import { AtList, AtListItem, AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction, AtInputNumber } from "taro-ui"
 import {aType, aPlatform} from '../../util/const'
 import {chapterData, WaitingItem} from '../../types/common'
-import {getStorage, setStorage} from '../../util/common'
+import {getStorage, setStorage, dayArrJoin} from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/modal.scss"
@@ -176,9 +176,9 @@ export default class Detail extends Component<{}, DetailState> {
           if (leftChaperNum > 0) {
             curChapterNum++
             leftChaper.push({
-              fullDate: [loopDate.getFullYear(), loopDate.getMonth() + 1, loopDate.getDate()].join('-'),
+              fullDate: dayArrJoin([loopDate.getFullYear(), loopDate.getMonth() + 1, loopDate.getDate()]),
               chapter: curChapterNum + '集',
-              date: [loopDate.getMonth() + 1, loopDate.getDate()].join('-')
+              date: dayArrJoin([loopDate.getMonth() + 1, loopDate.getDate()])
             })
             leftChaperNum--
           }
@@ -312,6 +312,7 @@ export default class Detail extends Component<{}, DetailState> {
                 <AtInputNumber
                   type="digit"
                   min={0}
+                  max={999}
                   step={1}
                   value={this.state.totalNum}
                   onChange={this.handleTotalNumChange.bind(this)}

@@ -7,7 +7,7 @@ import ChapterList from './chapterList'
 import {CalendarDay} from '../../types/calendar'
 import {chapterData, chapterCalendarItemData, chapterCalendarData, ChapterListItemProp} from '../../types/common'
 import {aPlatform} from '../../util/const'
-import { getStorage } from '../../util/common'
+import { getStorage, dayArrJoin } from '../../util/common'
 
 let oPlatform = {}
 aPlatform.forEach(item => {
@@ -130,7 +130,7 @@ export default class Index extends Component<{}> {
           const theDate: Date = new Date(this.calendarDayStart + forIndex * 86400000)
           const createdDate: number = this.theDayDate(item.createdDate)
           if (theDate.getTime() >= createdDate && (!item.totalChapterNum || item.totalChapterNum > curChapterNum)) {
-            const theDay: string = [theDate.getFullYear(), theDate.getMonth() + 1, theDate.getDate()].join('-')
+            const theDay: string = dayArrJoin([theDate.getFullYear(), theDate.getMonth() + 1, theDate.getDate()])
             if (!this.calendarData[theDay]) {
               this.calendarData[theDay] = []
             }
