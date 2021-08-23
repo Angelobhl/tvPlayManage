@@ -5,7 +5,6 @@ import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtRadio, AtCheckbox, AtList, AtListItem, AtInputNumber } from 'taro-ui'
 import {aType, aPlatform} from '../../util/const'
 import {addState, chapterData, WaitingItem} from '../../types/common'
-import {getStorage, setStorage} from '../../util/common'
 import { saveChapter } from '../../api/chapter'
 import { getWaitingItemByIndex, delWaiting } from '../../api/waiting'
 
@@ -41,7 +40,6 @@ function FormField (props: {label: string, children: React.ReactNode}) {
 export default class Add extends Component<{}, addState> {
   $instance: Taro.Current = getCurrentInstance()
   waiting: number = -1
-  aWaitingList: WaitingItem[] = []
 
   constructor (props: {}) {
     super(props)
@@ -185,14 +183,13 @@ export default class Add extends Component<{}, addState> {
       oData.endDate = endDate
     }
 
-    const aData: chapterData[] = getStorage<chapterData>('chapter')
-    this.fSaveData(aData, oData)
+    this.fSaveData(oData)
   }
 
-  async fSaveData (aData: chapterData[], oData: chapterData) {
+  async fSaveData (oData: chapterData) {
     const code: number = await saveChapter(oData)
     if (code === 0) {
-      if (this.waiting && this.aWaitingList.length) {
+      if (this.waiting) {
         delWaiting(this.waiting)
       }
 
