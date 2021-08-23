@@ -8,6 +8,7 @@ import {CalendarDay} from '../../types/calendar'
 import {chapterData, chapterCalendarItemData, chapterCalendarData, ChapterListItemProp} from '../../types/common'
 import {aPlatform} from '../../util/const'
 import { getStorage, dayArrJoin } from '../../util/common'
+import Http from '../../util/http'
 
 let oPlatform = {}
 aPlatform.forEach(item => {
@@ -59,7 +60,7 @@ export default class Index extends Component<{}> {
 
   componentWillUnmount () { }
 
-  componentDidShow () {
+  async componentDidShow () {
     const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
     if (aChapterData.length) {
       this.aChapterData = aChapterData
@@ -69,6 +70,11 @@ export default class Index extends Component<{}> {
       }
       this.fInitChapterData()
     }
+
+    const data = await Http.get({
+      url: '/chapter/list'
+    })
+    console.log(data)
   }
 
   componentDidHide () { }
