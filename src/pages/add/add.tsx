@@ -7,6 +7,7 @@ import {aType, aPlatform} from '../../util/const'
 import {addState, chapterData, WaitingItem} from '../../types/common'
 import {getStorage, setStorage} from '../../util/common'
 import { saveChapter } from '../../api/chapter'
+import { getWaitingItemByIndex, delWaiting } from '../../api/waiting'
 
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -73,20 +74,12 @@ export default class Add extends Component<{}, addState> {
 
   componentWillUnmount () { }
 
-  componentDidShow () {
+  async componentDidShow () {
     this.waiting = this.$instance.router.params.waiting ? +this.$instance.router.params.waiting : -1
     console.log(this.waiting)
 
     if (this.waiting > 0) {
-      this.aWaitingList = getStorage<WaitingItem>('waiting')
-      let item: WaitingItem
-      let len: number = this.aWaitingList.length
-      for (let i = 0; i < len; i++) {
-        if (this.aWaitingList[i].index === this.waiting) {
-          item = this.aWaitingList[i]
-          break
-        }
-      }
+      let item: WaitingItem = await getWaitingItemByIndex(this.waiting)
       if (item) {
         this.setState({
           title: item.title,
@@ -200,18 +193,7 @@ export default class Add extends Component<{}, addState> {
     const code: number = await saveChapter(oData)
     if (code === 0) {
       if (this.waiting && this.aWaitingList.length) {
-        let index = -1
-        let len: number = this.aWaitingList.length
-        for (let i = 0; i < len; i++) {
-          if (this.aWaitingList[i].index === this.waiting) {
-            index = i
-            break
-          }
-        }
-        if (index > -1) {
-          this.aWaitingList.splice(index, 1)
-          setStorage<WaitingItem>('waiting', this.aWaitingList)
-        }
+        delWaiting(this.waiting)
       }
 
       Taro.switchTab({

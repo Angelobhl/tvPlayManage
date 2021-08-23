@@ -1,23 +1,23 @@
-import { chapterData } from '../types/common'
+import { AccountItem } from '../types/accounts'
 import Http from '../util/http'
 import Taro from '@tarojs/taro'
 
-export const getList = async function (): Promise<chapterData[]> {
-  let aChapterData: chapterData[] = []
+export const getList = async function (): Promise<AccountItem[]> {
+  let aAccountItem: AccountItem[] = []
   const {code, data: {aList}} = await Http.get({
-    url: '/chapter/list'
+    url: '/account/list'
   })
   if (code === 0) {
-    aChapterData = aList
+    aAccountItem = aList
   }
 
-  return aChapterData
+  return aAccountItem
 }
 
-export const saveChapter = async function (chapter: chapterData): Promise<number> {
+export const saveAccount = async function (account: AccountItem): Promise<number> {
   const {code, message} = await Http.post({
-    url: '/chapter/save',
-    data: chapter
+    url: '/account/save',
+    data: account
   })
 
   if (code !== 0) {
@@ -30,9 +30,9 @@ export const saveChapter = async function (chapter: chapterData): Promise<number
   return code
 }
 
-export const delChapter = async function (index: number): Promise<number> {
+export const delAccount = async function (index: number): Promise<number> {
   const {code, message} = await Http.post({
-    url: '/chapter/del',
+    url: '/account/del',
     data: {index: index}
   })
 
