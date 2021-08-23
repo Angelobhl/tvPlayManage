@@ -14,6 +14,19 @@ export const getList = async function (): Promise<AccountItem[]> {
   return aAccountItem
 }
 
+export const getAccountItemByIndex = async function (index: number): Promise<AccountItem> {
+  let item: AccountItem
+
+  const {code, data} = await Http.get({
+    url: '/account/item?index=' + index
+  })
+  if (code === 0) {
+    return data as AccountItem
+  }
+
+  return item
+}
+
 export const saveAccount = async function (account: AccountItem): Promise<number> {
   const {code, message} = await Http.post({
     url: '/account/save',

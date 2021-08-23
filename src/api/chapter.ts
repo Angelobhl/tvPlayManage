@@ -14,6 +14,19 @@ export const getList = async function (): Promise<chapterData[]> {
   return aChapterData
 }
 
+export const getChapterItemByIndex = async function (index: number): Promise<chapterData> {
+  let item: chapterData
+
+  const {code, data} = await Http.get({
+    url: '/chapter/item?index=' + index
+  })
+  if (code === 0) {
+    return data as chapterData
+  }
+
+  return item
+}
+
 export const saveChapter = async function (chapter: chapterData): Promise<number> {
   const {code, message} = await Http.post({
     url: '/chapter/save',

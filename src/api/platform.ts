@@ -14,6 +14,19 @@ export const getList = async function (): Promise<PlatformItem[]> {
   return aPlatform
 }
 
+export const getChapterItemByIndex = async function (value: string): Promise<PlatformItem> {
+  let item: PlatformItem
+
+  const {code, data} = await Http.get({
+    url: '/platform/item?value=' + value
+  })
+  if (code === 0) {
+    return data as PlatformItem
+  }
+
+  return item
+}
+
 export const savePlatform = async function (plaftormItem: PlatformItem): Promise<number> {
   const {code, message} = await Http.post({
     url: '/platform/save',

@@ -4,7 +4,9 @@ import { View, Button } from '@tarojs/components'
 import { AtList, AtListItem, AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction, AtInputNumber } from "taro-ui"
 import {aType, aPlatform} from '../../util/const'
 import {chapterData, WaitingItem} from '../../types/common'
-import {getStorage, setStorage, dayArrJoin} from '../../util/common'
+import {dayArrJoin} from '../../util/common'
+import {getChapterItemByIndex, saveChapter, delChapter} from '../../api/chapter'
+import {saveWaiting} from '../../api/waiting'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/modal.scss"
@@ -55,19 +57,10 @@ export default class Detail extends Component<{}, DetailState> {
     }
   }
 
-  componentWillMount () {
-    const self = this
-
+  async componentWillMount () {
     this.index = +this.$instance.router.params.index || 0
-    let chapter: chapterData
-    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
+    let chapter: chapterData = await getChapterItemByIndex(this.index)
 
-    let item: chapterData
-    for (item of aChapterData) {
-      if (item.index === self.index) {
-        chapter = item
-      }
-    }
     if (!chapter) {
       Taro.navigateBack()
     } else {
@@ -226,27 +219,18 @@ export default class Detail extends Component<{}, DetailState> {
     })
   }
 
-  fSaveChaperInfo <T>(key: string, value: T) {
+  async fSaveChaperInfo <T>(key: string, value: T) {
     let chapter = this.state.chapter
     chapter[key] = value
 
-    this.setState({
-      chapter
-    })
-
-    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
-    let includeIndex: number = -1
-    aChapterData.forEach((item: chapterData, index: number) => {
-      if (item.index === chapter.index) {
-        includeIndex = index
-      }
-    })
-    if (includeIndex > -1) {
-      aChapterData[includeIndex] = chapter
-      setStorage<chapterData>('chapter', aChapterData)
+    const code = await saveChapter(chapter)
+    if (code === 0) {
       Taro.showToast({
         title: '保存成功',
         icon: 'none'
+      })
+      this.setState({
+        chapter
       })
     }
   }
@@ -263,17 +247,9 @@ export default class Detail extends Component<{}, DetailState> {
     })
   }
 
-  handleComfrimDel () {
-    const aChapterData: chapterData[] = getStorage<chapterData>('chapter')
-    let includeIndex: number = -1
-    aChapterData.forEach((item: chapterData, index: number) => {
-      if (item.index === this.index) {
-        includeIndex = index
-      }
-    })
-    if (includeIndex > -1) {
-      aChapterData.splice(includeIndex, 1)
-      setStorage<chapterData>('chapter', JSON.stringify(aChapterData))
+  async handleComfrimDel () {
+    const code = await delChapter(this.index)
+    if (code === 0) {
       Taro.switchTab({
         url: '/pages/index/index'
       })
@@ -287,16 +263,20 @@ export default class Detail extends Component<{}, DetailState> {
     }).then(res => {
       console.log(res)
       if (res.confirm) {
-        let waitingList: WaitingItem[] = getStorage<WaitingItem>('waiting')
         let item: WaitingItem = {
-          index: waitingList.length ? waitingList[waitingList.length - 1].index + 1 : 1,
+          index: 0,
           title: `${this.state.chapter.title}[${leftChaper.chapter}]`,
           type: this.state.chapter.type,
           platform: this.state.chapter.platform,
           date: leftChaper.fullDate
         }
-        waitingList.push(item)
-        setStorage<WaitingItem>('waiting', waitingList)
+        saveWaiting(item).then(res => {
+          if (res === 0 ) {
+            Taro.showToast({
+              title: '添加成功'
+            })
+          }
+        })
       }
     })
   }
