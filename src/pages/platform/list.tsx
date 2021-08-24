@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { AtList, AtListItem, AtButton, AtInput, AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
 import {PlatformItem} from '../../types/common'
 import {aPlatform} from '../../util/const'
-import {savePlatform} from '../../api/platform'
+import { setStorage } from '../../util/common'
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -49,6 +49,10 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
     this.aPlatform = aPlatform
   }
 
+  storePlatformStorage (aPlatform: PlatformItem[]) {
+    setStorage<PlatformItem>('platform', aPlatform)
+  }
+
   componentDidShow () {
     this.initPlatformData()
 
@@ -79,7 +83,7 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
     })
   }
 
-  async fSavePlatform () {
+  fSavePlatform () {
     let item: PlatformItem = {label: '', value: ''}
     item.label = this.state.modelData.label
     item.value = this.state.modelData.value
@@ -92,24 +96,22 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
       return false
     }
 
-    const code: number = await savePlatform(item)
-    if (code === 0) {
-
-      if (this.state.modalType === 'add') {
-        this.aPlatform.push(item)
-      } else {
-        for (let i = 0; 0 < this.aPlatform.length; i++) {
-          if (this.aPlatform[i].value === item.value) {
-            this.aPlatform[i].label = item.label
-            break
-          }
+    if (this.state.modalType === 'add') {
+      this.aPlatform.push(item)
+    } else {
+      for (let i = 0; 0 < this.aPlatform.length; i++) {
+        if (this.aPlatform[i].value === item.value) {
+          this.aPlatform[i].label = item.label
+          break
         }
       }
-      this.setState({
-        aList: this.aPlatform,
-        addModalShow: false
-      })
     }
+
+    this.storePlatformStorage(this.aPlatform)
+    this.setState({
+      aList: this.aPlatform,
+      addModalShow: false
+    })
   }
 
   handleModalPlatformTitle (label: string) {
