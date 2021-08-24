@@ -146,7 +146,7 @@ export default class Detail extends Component<{}, DetailState> {
       }
     }
 
-    return curChapterNum
+    return chapter.totalChapterNum ? Math.min(chapter.totalChapterNum, curChapterNum) : curChapterNum
   }
 
   showUpdateRule () {
