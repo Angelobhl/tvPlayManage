@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { AtList, AtListItem, AtButton, AtInput, AtModal, AtModalHeader, AtModalContent, AtModalAction } from "taro-ui"
 import {PlatformItem} from '../../types/common'
 import {aPlatform} from '../../util/const'
-import { setStorage } from '../../util/common'
+import {savePlatform} from '../../api/platform'
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -49,10 +49,6 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
     this.aPlatform = aPlatform
   }
 
-  storePlatformStorage (aPlatform: PlatformItem[]) {
-    setStorage<PlatformItem>('platform', aPlatform)
-  }
-
   componentDidShow () {
     this.initPlatformData()
 
@@ -83,7 +79,7 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
     })
   }
 
-  fSavePlatform () {
+  async fSavePlatform () {
     let item: PlatformItem = {label: '', value: ''}
     item.label = this.state.modelData.label
     item.value = this.state.modelData.value
@@ -96,22 +92,24 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
       return false
     }
 
-    if (this.state.modalType === 'add') {
-      this.aPlatform.push(item)
-    } else {
-      for (let i = 0; 0 < this.aPlatform.length; i++) {
-        if (this.aPlatform[i].value === item.value) {
-          this.aPlatform[i].label = item.label
-          break
+    const code: number = await savePlatform(item)
+    if (code === 0) {
+
+      if (this.state.modalType === 'add') {
+        this.aPlatform.push(item)
+      } else {
+        for (let i = 0; 0 < this.aPlatform.length; i++) {
+          if (this.aPlatform[i].value === item.value) {
+            this.aPlatform[i].label = item.label
+            break
+          }
         }
       }
+      this.setState({
+        aList: this.aPlatform,
+        addModalShow: false
+      })
     }
-
-    this.storePlatformStorage(this.aPlatform)
-    this.setState({
-      aList: this.aPlatform,
-      addModalShow: false
-    })
   }
 
   handleModalPlatformTitle (label: string) {
@@ -134,21 +132,29 @@ export default class PlatformList extends React.Component<{}, PlatformListStatus
         <AtModal isOpened={this.state.addModalShow}>
           <AtModalHeader>{this.state.modalType === 'add' ? '添加平台' : '编辑平台'}</AtModalHeader>
           <AtModalContent>
-            <AtInput
-              name='label'
-              type='text'
-              placeholder='请输入名称'
-              value={this.state.modelData.label}
-              onChange={this.handleModalPlatformTitle.bind(this)}
-            />
-            <AtInput
-              disabled={this.state.modalType !== 'add'}
-              name='value'
-              type='text'
-              placeholder='请输入关键字'
-              value={this.state.modelData.value}
-              onChange={this.handleModalPlatformValue.bind(this)}
-            />
+            {
+              this.state.addModalShow && (
+                <AtInput
+                  name='label'
+                  type='text'
+                  placeholder='请输入名称'
+                  value={this.state.modelData.label}
+                  onChange={this.handleModalPlatformTitle.bind(this)}
+                />
+              )
+            }
+            {
+              this.state.addModalShow && (
+                <AtInput
+                  disabled={this.state.modalType !== 'add'}
+                  name='value'
+                  type='text'
+                  placeholder='请输入关键字'
+                  value={this.state.modelData.value}
+                  onChange={this.handleModalPlatformValue.bind(this)}
+                />
+              )
+            }
           </AtModalContent>
           <AtModalAction>
             <Button onClick={this.fCancelModal.bind(this)}>取消</Button>
