@@ -96,7 +96,7 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
     })
   }
 
-  async handleDel () {
+  handleDel () {
     if (this.state.index > 0) {
       Taro.showModal({
         title: '想看',
