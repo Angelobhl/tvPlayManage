@@ -3,6 +3,7 @@ import Taro from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import {AccountItem} from '../../types/accounts'
 import { AtButton, AtList, AtListItem } from 'taro-ui'
+import {getList} from '../../api/account'
 
 import "taro-ui/dist/style/components/flex.scss"
 import "taro-ui/dist/style/components/button.scss" // 按需引入
@@ -41,15 +42,11 @@ export default class AccountList extends Component<{}, AccountsListState> {
 
   componentWillUnmount () { }
 
-  componentDidShow () {
-    const {keys} = Taro.getStorageInfoSync()
-    let accounts: string = ''
-    if (keys.length > 0) {
-      accounts = Taro.getStorageSync('accounts')
-    }
+  async componentDidShow () {
 
+    const accounts: AccountItem[] = await getList()
     this.setState({
-      lists: accounts ? JSON.parse(accounts) : []
+      lists: accounts
     })
   }
 
@@ -86,14 +83,6 @@ export default class AccountList extends Component<{}, AccountsListState> {
         <View className="at-row at-row__justify--around" style="margin-bottom: 10px;">
           <View className="at-col at-col-11">
             <AtButton type="primary" size="small" circle={true} onClick={this.handleAddClick}>添加</AtButton>
-          </View>
-        </View>
-        <View className="at-row at-row__justify--around">
-          <View className="at-col at-col-5">
-            <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/accounts/import') }}>导入</AtButton>
-          </View>
-          <View className="at-col at-col-5">
-            <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/accounts/export') }}>导出</AtButton>
           </View>
         </View>
       </View>

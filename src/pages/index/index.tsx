@@ -225,14 +225,6 @@ export default class Index extends Component<{}> {
             <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/chapters/chapters') }}>全部剧集</AtButton>
           </View>
         </View>
-        <View className="at-row at-row__justify--around" style="margin-bottom: 10px;">
-          <View className="at-col at-col-5">
-            <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/import/import') }}>导入</AtButton>
-          </View>
-          <View className="at-col at-col-5">
-            <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/export/export') }}>导出</AtButton>
-          </View>
-        </View>
         <View className="at-row at-row__justify--around">
           <View className="at-col at-col-5">
             <AtButton type="primary" size="small" circle={true} onClick={() => { this.handlePageJump('/pages/platform/list') }}>剧集平台</AtButton>

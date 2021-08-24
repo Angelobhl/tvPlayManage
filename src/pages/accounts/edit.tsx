@@ -4,6 +4,7 @@ import { View, Button } from '@tarojs/components'
 import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtList, AtListItem, AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui'
 import {AccountItem} from '../../types/accounts'
+import {saveAccount, getAccountItemByIndex, delAccount} from '../../api/account'
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
@@ -31,7 +32,6 @@ interface AccountEditState {
 export default class AccountEdit extends Component<{}, AccountEditState> {
   $instance: Taro.Current = getCurrentInstance()
   index: number
-  aAccounts: AccountItem[]
 
   constructor (prop: {}) {
     super(prop)
@@ -47,26 +47,16 @@ export default class AccountEdit extends Component<{}, AccountEditState> {
     }
   }
 
-  componentDidShow () {
+  async componentDidShow () {
     const {keys} = Taro.getStorageInfoSync()
     this.index = +this.$instance.router.params.index || 0
 
-    this.aAccounts = []
-    if (keys.length > 0) {
-      const accounts: string = Taro.getStorageSync('accounts')
-      if (accounts) {
-        this.aAccounts = JSON.parse(accounts)
-        let accountItem: AccountItem
+    const accountItem: AccountItem = await getAccountItemByIndex(this.index)
 
-        for (accountItem of this.aAccounts) {
-          if (accountItem.index === this.index) {
-            break
-          }
-        }
-        this.setState({
-          accountItem: {...accountItem}
-        })
-      }
+    if (accountItem.index) {
+      this.setState({
+        accountItem: {...accountItem}
+      })
     } else {
       Taro.switchTab({
         url: '/pages/accounts/list'
@@ -92,7 +82,7 @@ export default class AccountEdit extends Component<{}, AccountEditState> {
     })
   }
 
-  handleSubmit () {
+  async handleSubmit () {
     if (!this.state.accountItem.name || !this.state.accountItem.account || !this.state.accountItem.endLine) {
       Taro.showToast({
         title: '全部必填',
@@ -101,22 +91,10 @@ export default class AccountEdit extends Component<{}, AccountEditState> {
       return false
     }
 
-    let accountIndex: string
-    for (accountIndex in this.aAccounts) {
-      if (this.aAccounts[accountIndex].index === this.state.accountItem.index) {
-        this.aAccounts[accountIndex] = this.state.accountItem
-        break
-      }
-    }
-
-    try {
-      Taro.setStorageSync('accounts', JSON.stringify(this.aAccounts))
+    const code: number = await saveAccount(this.state.accountItem)
+    if (code === 0) {
       Taro.switchTab({
         url: '/pages/accounts/list'
-      })
-    } catch (e) {
-      Taro.showToast({
-        title: '保存失败'
       })
     }
   }
@@ -127,25 +105,12 @@ export default class AccountEdit extends Component<{}, AccountEditState> {
     })
   }
 
-  fConfirmDel () {
-    let accountIndex: string
-    for (accountIndex in this.aAccounts) {
-      if (this.aAccounts[accountIndex].index === this.state.accountItem.index) {
-        break
-      }
-    }
-
-    this.aAccounts.splice(+accountIndex, 1)
-
-    try {
-      Taro.setStorageSync('accounts', JSON.stringify(this.aAccounts))
+  async fConfirmDel () {
+    const code: number = await delAccount(this.state.accountItem.index)
+    if (code === 0) {
       this.handleModelShow(false)
       Taro.switchTab({
         url: '/pages/accounts/list'
-      })
-    } catch (e) {
-      Taro.showToast({
-        title: '保存失败'
       })
     }
   }

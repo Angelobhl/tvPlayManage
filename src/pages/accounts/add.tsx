@@ -4,6 +4,7 @@ import { View } from '@tarojs/components'
 import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtList, AtListItem } from 'taro-ui'
 import {AccountItem} from '../../types/accounts'
+import {saveAccount} from '../../api/account'
 
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
 import 'taro-ui/dist/style/components/input.scss' // 按需引入
@@ -22,33 +23,18 @@ function FormField (props: {label: string, children: React.ReactNode}) {
 }
 
 export default class AccountAdd extends Component<{}, AccountItem> {
-  aAccounts: AccountItem[]
-
   constructor (prop: {}) {
     super(prop)
 
     this.state = {
-      index: 1,
+      index: 0,
       name: '',
       endLine: '',
       account: ''
     }
   }
 
-  componentDidShow () {
-    const {keys} = Taro.getStorageInfoSync()
-    this.aAccounts = []
-    if (keys.length > 0) {
-      const accounts: string = Taro.getStorageSync('accounts')
-      if (accounts) {
-        this.aAccounts = JSON.parse(accounts)
-
-        this.setState({
-          index: this.aAccounts[this.aAccounts.length - 1].index + 1
-        })
-      }
-    }
-  }
+  componentDidShow () {}
 
   handleNameChange (name: string) {
     this.setState({
@@ -68,9 +54,7 @@ export default class AccountAdd extends Component<{}, AccountItem> {
     })
   }
 
-  handleSubmit () {
-    console.log(this.state)
-
+  async handleSubmit () {
     if (!this.state.name || !this.state.account || !this.state.endLine) {
       Taro.showToast({
         title: '全部必填',
@@ -79,16 +63,10 @@ export default class AccountAdd extends Component<{}, AccountItem> {
       return false
     }
 
-    this.aAccounts.push(this.state)
-
-    try {
-      Taro.setStorageSync('accounts', JSON.stringify(this.aAccounts))
+    const code = await saveAccount(this.state)
+    if (code === 0) {
       Taro.switchTab({
         url: '/pages/accounts/list'
-      })
-    } catch (e) {
-      Taro.showToast({
-        title: '添加失败'
       })
     }
   }
