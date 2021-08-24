@@ -98,12 +98,20 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
 
   async handleDel () {
     if (this.state.index > 0) {
-      const code = await delWaiting(this.state.index)
-      if (code === 0) {
-        Taro.switchTab({
-          url: '/pages/waiting/list'
-        })
-      }
+      Taro.showModal({
+        title: '想看',
+        content: '添加到想到？'
+      }).then(res => {
+        if (res.confirm) {
+          delWaiting(this.state.index).then(res => {
+            if (res === 0 ) {
+              Taro.switchTab({
+                url: '/pages/waiting/list'
+              })
+            }
+          })
+        }
+      })
     }
   }
 

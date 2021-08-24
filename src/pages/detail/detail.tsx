@@ -261,7 +261,6 @@ export default class Detail extends Component<{}, DetailState> {
       title: '想看',
       content: '添加到想到？'
     }).then(res => {
-      console.log(res)
       if (res.confirm) {
         let item: WaitingItem = {
           index: 0,
