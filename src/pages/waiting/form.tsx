@@ -5,7 +5,7 @@ import { Picker } from '@tarojs/components'
 import { AtForm, AtInput, AtButton, AtRadio, AtList, AtListItem } from 'taro-ui'
 import {WaitingItem} from '../../types/common'
 import {aPlatform, aType} from '../../util/const'
-import { getStorage, setStorage } from '../../util/common'
+import {getWaitingItemByIndex, saveWaiting, delWaiting} from '../../api/waiting'
 
 import "taro-ui/dist/style/components/flex.scss"
 import 'taro-ui/dist/style/components/form.scss' // 按需引入
@@ -27,7 +27,6 @@ function FormField (props: {label: string, children: React.ReactNode}) {
 
 export default class WaitingForm extends React.Component<{}, WaitingItem> {
   $instance: Taro.Current = getCurrentInstance()
-  aList: WaitingItem[]
 
   constructor (prop: {}) {
     super(prop)
@@ -41,24 +40,18 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
     }
   }
 
-  componentDidShow () {
-    this.aList = getStorage<WaitingItem>('waiting')
-
+  async componentDidShow () {
     let item: WaitingItem = {
-      index: +this.$instance.router.params.index || 0,
+      index: 0,
       title: '',
       date: '',
       type: '',
       platform: ''
     }
-    let len: number = this.aList.length
-    for (let i = 0; i < len; i++) {
-      if (this.aList[i].index === item.index) {
-        item.title = this.aList[i].title
-        item.date = this.aList[i].date
-        item.type = this.aList[i].type
-        item.platform = this.aList[i].platform
-      }
+    const index: number = +this.$instance.router.params.index
+
+    if (index) {
+      item = await getWaitingItemByIndex(index)
     }
 
     this.setState(item)
@@ -88,33 +81,13 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
     })
   }
 
-  handleSave () {
-    if (this.state.index > 0) {
-      let len: number = this.aList.length
-      for (let i: number = 0; i < len; i++) {
-        if (this.aList[i].index === this.state.index) {
-          this.aList[i].title = this.state.title
-          this.aList[i].date = this.state.date
-          this.aList[i].platform = this.state.platform
-          this.aList[i].type = this.state.type
-          break
-        }
-      }
-    } else {
-      let item: WaitingItem = {
-        index: this.aList.length ? this.aList[this.aList.length - 1].index + 1 : 1,
-        title: this.state.title,
-        date: this.state.date,
-        platform: this.state.platform,
-        type: this.state.type
-      }
-      this.aList.push(item)
+  async handleSave () {
+    const code: number = await saveWaiting(this.state)
+    if (code === 0) {
+      Taro.switchTab({
+        url: '/pages/waiting/list'
+      })
     }
-
-    setStorage<WaitingItem>('waiting', this.aList)
-    Taro.switchTab({
-      url: '/pages/waiting/list'
-    })
   }
 
   handleBeWatching () {
@@ -123,28 +96,12 @@ export default class WaitingForm extends React.Component<{}, WaitingItem> {
     })
   }
 
-  handleDel () {
+  async handleDel () {
     if (this.state.index > 0) {
-      let index: number = -1
-      let len: number = this.aList.length
-      for (let i = 0; i < len; i++) {
-        if (this.aList[i].index === this.state.index) {
-          index = i
-        }
-      }
-
-      if (index > -1) {
-        Taro.showModal({
-          title: '提示',
-          content: '确认删除？'
-        }).then(res => {
-          if (res.confirm) {
-            this.aList.splice(index, 1)
-            setStorage<WaitingItem>('waiting', this.aList)
-            Taro.switchTab({
-              url: '/pages/waiting/list'
-            })
-          }
+      const code = await delWaiting(this.state.index)
+      if (code === 0) {
+        Taro.switchTab({
+          url: '/pages/waiting/list'
         })
       }
     }

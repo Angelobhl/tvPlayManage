@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { AtList, AtListItem, AtButton } from "taro-ui"
 import {WaitingItem} from '../../types/common'
 import {aPlatform} from '../../util/const'
-import { getStorage } from '../../util/common'
+import {getList} from '../../api/waiting'
 
 let oPlatform = {}
 aPlatform.forEach(item => {
@@ -42,8 +42,8 @@ export default class WaitingList extends React.Component<{}, WaitingListState> {
     }
   }
 
-  componentDidShow () {
-    const aList: WaitingItem[] = getStorage<WaitingItem>('waiting')
+  async componentDidShow () {
+    const aList: WaitingItem[] = await getList()
 
     this.setState({
       aList
