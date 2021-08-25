@@ -1,4 +1,5 @@
 import Taro, { Chain } from '@tarojs/taro'
+import {getStorageStr} from '../util/common'
 
 class Http {
   baseUrl: string = 'http://localhost:8080'
@@ -19,10 +20,14 @@ class Http {
 
   beforeRequest (chain: Chain) {
     const requestParams = chain.requestParams
+    const openId: string = getStorageStr('openId')
     if (!requestParams.url.includes('http://')) {
       requestParams.url = this.baseUrl + requestParams.url
     }
     requestParams.dataType = 'json'
+    requestParams.header = {
+      open_id: openId
+    }
 
     return chain.proceed(requestParams)
   }

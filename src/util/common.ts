@@ -14,6 +14,17 @@ export const getStorage = function<T>(key: string): T[] {
   return result
 }
 
+export const getStorageStr = function(key: string): string {
+  let result: string = ''
+
+  const {keys} = Taro.getStorageInfoSync()
+  if (keys.length > 0) {
+    result = Taro.getStorageSync(key)
+  }
+
+  return result
+}
+
 export const setStorage = function<T>(key: string, data: T[] | string): void {
   try {
     Taro.setStorageSync(key, typeof data === 'string' ? data : JSON.stringify(data))
