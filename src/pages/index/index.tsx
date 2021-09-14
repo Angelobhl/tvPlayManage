@@ -137,7 +137,7 @@ export default class Index extends Component<{}> {
             let chapter: number[] = []
             let i: number = 0
             for (; i < item.updateNum; i++) {
-              if (!item.totalChapterNum || curChapterNum <= item.totalChapterNum) {
+              if (!item.totalChapterNum || curChapterNum < item.totalChapterNum) {
                 chapter.push(++curChapterNum)
               }
             }
