@@ -137,7 +137,9 @@ export default class Index extends Component<{}> {
             let chapter: number[] = []
             let i: number = 0
             for (; i < item.updateNum; i++) {
-              chapter.push(++curChapterNum)
+              if (!item.totalChapterNum || curChapterNum <= item.totalChapterNum) {
+                chapter.push(++curChapterNum)
+              }
             }
             this.calendarData[theDay].push({
               index: item.index,
