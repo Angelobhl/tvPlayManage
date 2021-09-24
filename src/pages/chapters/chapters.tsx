@@ -41,6 +41,9 @@ export default class Chapters extends Component {
           platform: oPlatform[item.platform]
         })
       }
+      aList.sort((a: ChapterListItemProp, b: ChapterListItemProp) => {
+        return a.chapterNum > b.chapterNum ? 1 : -1
+      })
 
       this.chapterListRef.current && this.chapterListRef.current.fSetList(aList)
     }
