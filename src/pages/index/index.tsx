@@ -106,14 +106,18 @@ export default class Index extends Component<{}> {
       if (createdDate < this.calendarDayStart) {
         const dayPast: number = Math.ceil((this.calendarDayStart - createdDate) / 86400000)
 
-        curChapterNum += Math.floor(dayPast / 7) * item.weekDays.length
+        // 已经过去的天数，换算出一个完整的周的数量
+        // 加上这几个周里更新的集数
+        curChapterNum += Math.floor(dayPast / 7) * item.weekDays.length * item.updateNum
 
+        // 已经过去的天数，除去完整的周，还剩的天数
+        // 加上这几天里，符合更新天的集数
         const dayPastLeft: number = dayPast % 7
         let day = new Date(createdDate).getDay() || 7
         let i: number = 0
         for (; i < dayPastLeft; i++){
           if (item.weekDays.includes(day)) {
-            curChapterNum++
+            curChapterNum += item.updateNum
           }
           day++
           if (day > 7) {
